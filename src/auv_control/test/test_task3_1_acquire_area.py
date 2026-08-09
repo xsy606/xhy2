@@ -248,7 +248,8 @@ class Task3AcquireAreaTest(object):
             "~final_hold_timeout", 30.0
         ))
         self.max_wait_seconds = float(rospy.get_param(
-            "~max_wait_seconds", 300.0
+            "~max_wait_seconds",
+            rospy.get_param("/task3_final/arrow1_timeout_seconds"),
         ))
         self.cancel_timeout = float(rospy.get_param(
             "/task3_protection/cancel_recovery_timeout", 30.0

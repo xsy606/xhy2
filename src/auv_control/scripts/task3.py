@@ -577,20 +577,17 @@ class Task3Final:
         ))
         self.rate_hz = float(rospy.get_param("~rate", 10.0))
         self.arrow1_timeout_seconds = float(rospy.get_param(
-            "/task3_final/arrow1_timeout_seconds",
-            self.task1_params.get("max_wait_seconds", 120.0),
+            "/task3_final/arrow1_timeout_seconds"
         ))
         self.aruco_timeout_seconds = float(rospy.get_param(
             "/task3_final/aruco_timeout_seconds",
             self.task2_params.get("max_wait_seconds", 120.0),
         ))
         self.arrow2_timeout_seconds = float(rospy.get_param(
-            "/task3_final/arrow2_timeout_seconds",
-            self.task1_params.get("max_wait_seconds", 120.0),
+            "/task3_final/arrow2_timeout_seconds"
         ))
         self.box_timeout_seconds = float(rospy.get_param(
-            "/task3_final/box_timeout_seconds",
-            self.task3_params.get("max_wait_seconds", 120.0),
+            "/task3_final/box_timeout_seconds"
         ))
         arrow2_search_parameter_names = (
             "search_initial_forward_distance",
@@ -1383,7 +1380,6 @@ class Task3Final:
         self.log_raw_string_frame(
             "rectangle_detections", self.rectangle_topic, message
         )
-        self.forward_rectangle_candidates(message)
         self._record_model_frame("rectangle")
 
     def _model_snapshot(self):
@@ -2466,7 +2462,6 @@ class Task3Final:
         flow_step = (
             "3/3" if self.skip_second_arrow else "4/4"
         )
-        self.task3_params["max_wait_seconds"] = self.box_timeout_seconds
         self.task3_params["search_yaw_deg"] = (
             math.degrees(search_yaw) % 360.0
         )
@@ -2512,7 +2507,7 @@ class Task3Final:
             KEY_LOG_MARKER,
             label,
             target_color,
-            float(self.task3_params["max_wait_seconds"]),
+            self.box_timeout_seconds,
             "正常自动搜索",
         )
         task = None

@@ -5,6 +5,7 @@
 
       所有模式、识别、搜索、对准、动作门槛和执行器数值统一在
       config/task3.yaml的test_task3_3_inspect_and_drop段修改。
+      总超时统一读取task3_final.box_timeout_seconds。
       本launch只负责加载统一配置、启动方框模型和连接ROS话题。
       motion_supervisor由基础控制系统统一启动，本launch不重复启动。
     -->

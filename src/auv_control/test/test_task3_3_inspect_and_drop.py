@@ -112,7 +112,6 @@ DEFAULT_AUTO_HOVER_CONFIRM_SETTLE_SECONDS = 0.5
 DEFAULT_STABLE_CENTER_TOLERANCE_PX = 40.0
 DEFAULT_STABLE_AREA_TOLERANCE_RATIO = 0.35
 DEFAULT_DETECTION_TIMEOUT = 2.0
-DEFAULT_MAX_WAIT_SECONDS = 300.0
 
 # 操作模式和 motion_supervisor 接口参数。
 DEFAULT_OPERATION_MODE = "manual"
@@ -302,9 +301,9 @@ class Task3InspectAndDropTest:
         self.detection_timeout = float(
             rospy.get_param("~detection_timeout", DEFAULT_DETECTION_TIMEOUT)
         )
-        self.max_wait_seconds = float(
-            rospy.get_param("~max_wait_seconds", DEFAULT_MAX_WAIT_SECONDS)
-        )
+        self.max_wait_seconds = float(rospy.get_param(
+            "/task3_final/box_timeout_seconds"
+        ))
         self.hold_seconds = float(
             rospy.get_param("~hold_seconds", DEFAULT_HOLD_SECONDS)
         )

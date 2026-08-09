@@ -2,8 +2,8 @@
     <!--
       任务3子任务1：箭头搜索和双滑动窗闭环对准。
 
-      所有识别阈值、帧数、距离、增益、容差和时间统一在
-      config/task3.yaml的test_task3_1_acquire_area段修改。
+      识别阈值、帧数、距离、增益和容差统一在config/task3.yaml的
+      test_task3_1_acquire_area段修改；总超时读取task3_final.arrow1_timeout_seconds。
       本launch只负责加载统一配置、启动箭头模型和连接ROS话题。
       motion_supervisor由基础控制系统统一启动，本launch不重复启动。
     -->
