@@ -153,6 +153,7 @@ class Task1(Task1LineFollow):
                 ),
                 use_reference_depth=self.use_reference_depth,
                 reference_depth=self.reference_depth,
+                startup_depth_tolerance=self.startup_depth_tolerance,
                 use_reference_start_pose=self.use_reference_start_pose,
                 reference_start_pose={
                     "position": [
@@ -449,6 +450,7 @@ class Task1(Task1LineFollow):
             },
             use_reference_depth=self.use_reference_depth,
             reference_depth=self.reference_depth,
+            startup_depth_tolerance=self.startup_depth_tolerance,
             use_reference_start_pose=self.use_reference_start_pose,
             reference_start_pose={
                 "position": [
@@ -1060,6 +1062,8 @@ class Task1(Task1LineFollow):
 
     def stage_description(self):
         if self.state == self.WAIT_CAMERA:
+            if not self.startup_dive_complete:
+                return "保持启动XY和航向并下潜到任务深度"
             if self.startup_hold_started is None:
                 return "前往启动位姿并等待识别和运动数据就绪"
             return "保持启动位置并执行启动缓冲"
@@ -1187,6 +1191,9 @@ class Task1(Task1LineFollow):
             use_reference_depth=self.use_reference_depth,
             reference_depth=self.reference_depth,
             active_depth=self.hold_z,
+            startup_depth_tolerance=self.startup_depth_tolerance,
+            startup_dive_complete=self.startup_dive_complete,
+            startup_dive_goal=self.pose_record(self.startup_dive_pose),
             yellow_contact_enabled=self.yellow_contact_enabled,
             yellow_alignment_frame=self.yellow_alignment_frame,
             yellow_alignment_pose=self.pose_record(
