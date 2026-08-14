@@ -280,12 +280,18 @@ class Task1LineFollow:
         self.reference_depth = float(rospy.get_param(
             "~reference_depth", -0.99
         ))
-        self.use_reference_yaw = bool(rospy.get_param(
-            "~use_reference_yaw", False
+        self.use_reference_start_pose = bool(rospy.get_param(
+            "~use_reference_start_pose", False
         ))
-        self.reference_yaw = wrap_angle(math.radians(float(rospy.get_param(
-            "~reference_yaw_deg", 0.0
-        ))))
+        self.reference_start_x = float(rospy.get_param(
+            "~reference_start_x", 0.0
+        ))
+        self.reference_start_y = float(rospy.get_param(
+            "~reference_start_y", 0.0
+        ))
+        self.reference_start_yaw = wrap_angle(math.radians(float(
+            rospy.get_param("~reference_start_yaw_deg", 0.0)
+        )))
         self.line_topic = rospy.get_param("~line_topic", "/obj/line_message")
         self.finished_topic = rospy.get_param("~finished_topic", "/finished")
         self.camera_topic = rospy.get_param("~camera_topic", "/left/image_raw")
@@ -700,11 +706,14 @@ class Task1LineFollow:
             if self.use_reference_depth
             else current.pose.position.z
         )
+        if self.use_reference_start_pose:
+            self.start_pose.pose.position.x = self.reference_start_x
+            self.start_pose.pose.position.y = self.reference_start_y
         self.start_pose.pose.position.z = self.hold_z
         current_yaw = yaw_from_quaternion(current.pose.orientation)
         self.search_base_yaw = (
-            self.reference_yaw
-            if self.use_reference_yaw
+            self.reference_start_yaw
+            if self.use_reference_start_pose
             else current_yaw
         )
         self.start_pose.pose.orientation = Quaternion(*quaternion_from_euler(
@@ -712,21 +721,22 @@ class Task1LineFollow:
         ))
         self.startup_hold_started = None
         rospy.loginfo(
-            "%s: 当前位姿=(%.2f, %.2f, %.2f)，启动深度=%.2f m（%s），"
-            "启动航向=%.1f deg（%s）",
+            "%s: 当前位姿=(%.2f, %.2f, %.2f)，启动目标="
+            "(%.2f, %.2f, %.2f, %.1f deg)（%s）",
             NODE_NAME,
             current.pose.position.x,
             current.pose.position.y,
             current.pose.position.z,
-            self.hold_z,
-            "参考深度" if self.use_reference_depth else "当前深度",
+            self.start_pose.pose.position.x,
+            self.start_pose.pose.position.y,
+            self.start_pose.pose.position.z,
             math.degrees(self.search_base_yaw),
-            "参考航向" if self.use_reference_yaw else "当前航向",
+            "指定XY/航向" if self.use_reference_start_pose else "当前XY/航向",
         )
-        if self.use_reference_yaw:
+        if self.use_reference_start_pose:
             rospy.loginfo(
-                "%s: 启动阶段先原地旋转到参考航向；收到 HOVER 且输入"
-                "数据均就绪后开始定点缓冲",
+                "%s: 启动阶段先前往指定起点并指向指定航向；收到 HOVER"
+                " 且输入数据均就绪后开始定点缓冲",
                 NODE_NAME,
             )
         return True
@@ -2766,7 +2776,7 @@ class Task1LineFollow:
                 ):
                     self.startup_hold_started = rospy.Time.now()
                     rospy.loginfo(
-                        "%s: 参考航向、运动节点及识别数据均已就绪；"
+                        "%s: 启动位姿、运动节点及识别数据均已就绪；"
                         "开始启动定点缓冲 %.1f s",
                         NODE_NAME,
                         self.startup_hold_seconds,
@@ -2797,7 +2807,7 @@ class Task1LineFollow:
                     (
                         "定点等待识别"
                         if self.startup_hold_started is not None
-                        else "旋转到参考航向"
+                        else "前往启动位姿"
                     ),
                     ", ".join(
                         "%s=%s" % (
